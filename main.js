@@ -324,12 +324,14 @@ startButton.addEventListener('click', function() {
 	startSpeechRecognition();
 });
 
-// keep aria-disabled in sync with visual state
+// keep aria-disabled and disabled in sync with visual state
 var observer = new MutationObserver(function() {
 	if (startButton.classList.contains('disabled')) {
 		startButton.setAttribute('aria-disabled', 'true');
+		startButton.setAttribute('disabled', 'disabled');
 	} else {
 		startButton.removeAttribute('aria-disabled');
+		startButton.removeAttribute('disabled');
 	}
 });
 observer.observe(startButton, { attributes: true, attributeFilter: ['class'] });

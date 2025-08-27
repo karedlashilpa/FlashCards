@@ -64,6 +64,7 @@ function homeCtrl($scope) {
 
     document.getElementsByClassName('startButton')[0].classList.remove('disabled');
     document.getElementsByClassName('startButton')[0].removeAttribute('aria-disabled');
+    document.getElementsByClassName('startButton')[0].removeAttribute('disabled');
 
     var previouslySelected = document.getElementsByClassName('selected');
     for (var i = 0; i < previouslySelected.length; i++) {

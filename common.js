@@ -138,7 +138,12 @@ var common = {
 			window.switchToSecondInstructions();
 		}
 
-		document.getElementsByClassName('startButton')[0].classList.remove('disabled');
+		var startBtn = document.getElementsByClassName('startButton')[0];
+		if (startBtn) {
+			startBtn.classList.remove('disabled');
+			startBtn.removeAttribute('aria-disabled');
+			startBtn.removeAttribute('disabled');
+		}
 
 		// update visual and ARIA selected states
 		var previouslySelected = document.getElementsByClassName('selected');
