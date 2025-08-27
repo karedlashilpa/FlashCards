@@ -268,9 +268,10 @@ a:hover { color: var(--primary-700); }
 .problem {
   font-weight: 900;
   font-family: "Nunito", Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-  font-size: clamp(32px, 8vw, 88px);
-  line-height: 1.1;
-  letter-spacing: 0.5px;
+  /* Reduced max size and viewport scaling to keep questions readable but not oversized */
+  font-size: clamp(28px, 6vw, 64px);
+  line-height: 1.15;
+  letter-spacing: 0.4px;
   text-align: center;
   color: var(--text);
   margin: 4px 6px 10px 6px;
@@ -341,7 +342,8 @@ a:hover { color: var(--primary-700); }
     font-size: 16px;
   }
   .problem {
-    font-size: clamp(28px, 10vw, 64px);
+    /* Slightly reduce mobile scaling as well for consistency */
+    font-size: clamp(24px, 8vw, 52px);
   }
 }
 
