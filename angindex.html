@@ -132,8 +132,9 @@
           </span>
         </div>
 
-        <div class="card component hidden">
-          <div class="problem"></div>
+        <div class="card component hidden" role="group" aria-label="Flashcard">
+          <div class="problem" role="heading" aria-level="2"></div>
+          <div id="answerOptions" class="answerOptions" aria-label="Answer options"></div>
         </div>
         <div class="iHeard component hidden">
           <span class="iHeardLabel">I think I heard you say:</span> <span id="iHeardText"></span>
