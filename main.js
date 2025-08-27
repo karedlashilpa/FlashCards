@@ -324,9 +324,46 @@ startButton.addEventListener('click', function() {
 	startSpeechRecognition();
 });
 
+// keep aria-disabled in sync with visual state
+var observer = new MutationObserver(function() {
+	if (startButton.classList.contains('disabled')) {
+		startButton.setAttribute('aria-disabled', 'true');
+	} else {
+		startButton.removeAttribute('aria-disabled');
+	}
+});
+observer.observe(startButton, { attributes: true, attributeFilter: ['class'] });
+
 var languageSelector = document.getElementsByClassName('languageSelector')[0];
+languageSelector.setAttribute('id','languageSelector');
 languageSelector.addEventListener('change', function() {
 	selectedLanguage = languageSelector.options[languageSelector.selectedIndex].value;
 });
+
+// Keyboard accessibility for category items: Enter/Space activate selection
+(function addCategoryKeyboardSupport(){
+	function onKeydown(e){
+		if (e.key === 'Enter' || e.key === ' ') {
+			e.preventDefault();
+			this.click();
+		}
+	}
+	function enhance(){
+		var items = document.getElementsByClassName('category');
+		for (var i = 0; i < items.length; i++) {
+			items[i].setAttribute('tabindex','0');
+			items[i].setAttribute('role','option');
+			items[i].addEventListener('keydown', onKeydown);
+		}
+	}
+	// initial
+	enhance();
+	// when categories rerender, re-apply
+	var list = document.getElementsByClassName('categoryList')[0];
+	if (list) {
+		var listObserver = new MutationObserver(function(){ enhance(); });
+		listObserver.observe(list, { childList: true });
+	}
+})();
 
 var doneSound = new Audio('done.mp3');

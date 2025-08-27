@@ -22,6 +22,15 @@ a:hover {
 	display: none;
 }
 
+/* Screen-reader only content */
+.visually-hidden {
+	position: absolute !important;
+	height: 1px; width: 1px;
+	overflow: hidden;
+	clip: rect(1px, 1px, 1px, 1px);
+	white-space: nowrap; /* prevent line breaks */
+}
+
 .content {
     width: 100%;
     white-space: nowrap;

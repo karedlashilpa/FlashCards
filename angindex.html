@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app>
+<html ng-app lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
@@ -10,12 +10,13 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.6/angular.min.js"></script>
   </head>
   <body ng-controller="homeCtrl">
-    <div ng-class="warningsClasses">{{warnings}}</div>
+    <div ng-class="warningsClasses" role="status" aria-live="polite">{{warnings}}</div>
     <div class="content">
       <span class="navigation">
-        <div id="categoryComponent" class="component">
-          <ul class="categoryList">
-            <li class="category {{if (true) selected; }}" name="{{category.name}}" ng-repeat="category in categories" ng-click="categoryChanged($event)">
+        <div id="categoryComponent" class="component" aria-labelledby="ngCategoryHeading">
+          <h2 id="ngCategoryHeading" class="visually-hidden">Categories</h2>
+          <ul class="categoryList" role="listbox" aria-label="Flashcard categories">
+            <li class="category {{if (true) selected; }}" role="option" tabindex="0" aria-selected="false" name="{{category.name}}" ng-repeat="category in categories" ng-click="categoryChanged($event)" ng-keydown="$event.key==='Enter'||$event.key===' ' ? categoryChanged($event) : null">
               {{category.displayName}}
             </li>
           </ul>
@@ -24,10 +25,12 @@
             <a href="addEditList.html">Add more...</a>
           </div>
         </div>
-        <div class="component">
-          <canvas id="cnvTimer" width="150" height="150"></canvas>
-          <div class="timeRemaining">1:00</div>
-          <select class="languageSelector">
+        <div class="component" aria-labelledby="ngTimerHeading">
+          <h2 id="ngTimerHeading" class="visually-hidden">Timer and Controls</h2>
+          <canvas id="cnvTimer" width="150" height="150" role="img" aria-label="Countdown timer"></canvas>
+          <div class="timeRemaining" aria-live="polite">1:00</div>
+          <label for="languageSelector" class="visually-hidden">Recognition language</label>
+          <select class="languageSelector" id="languageSelector" aria-label="Recognition language">
             <option value="af-ZA">Afrikaans</option>
             <option value="id-ID">Bahasa Indonesia</option>
             <option value="ms-MY">Bahasa Melayu</option>
@@ -96,14 +99,14 @@
       <span class="problemArea">
         <div class="component instructions" id="firstInstructions">
           Which category would like to see problems for?
-          <img src="arrow.png" class="leftArrow" />
+          <img src="arrow.png" class="leftArrow" alt="" />
         </div>
 
         <div class="component instructions hidden" id="secondInstructions">
           You will have 60 seconds to get as many correct as you can.  When you click "Start" the browser will ask you for permission to use the microphone.  Once cards start appearing, say the answers out loud.  A new problem won't given until either you say "skip" or get the problem right.
         </div>
 
-        <div class="component scores hidden">
+        <div class="component scores hidden" role="status" aria-live="polite">
           <span class="currentScore">
             Score: <span id="currentScoreValue"></span>
           </span>
@@ -112,11 +115,11 @@
           </span>
         </div>
 
-        <div class="card component hidden">
-          <div class="problem"></div>
+        <div class="card component hidden" role="region" aria-label="Current problem card">
+          <div class="problem" aria-live="polite"></div>
         </div>
-        <div class="iHeard component hidden">
-          <span class="iHeardLabel">I think I heard you say:</span> <span id="iHeardText"></span>
+        <div class="iHeard component hidden" role="region" aria-labelledby="ngIHeardLabel">
+          <span class="iHeardLabel" id="ngIHeardLabel">I think I heard you say:</span> <span id="iHeardText" aria-live="polite"></span>
           <div class="skipHint">
             If you get stuck, say "skip"...
           </div>

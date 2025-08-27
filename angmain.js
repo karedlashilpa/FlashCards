@@ -63,11 +63,15 @@ function homeCtrl($scope) {
     }
 
     document.getElementsByClassName('startButton')[0].classList.remove('disabled');
+    document.getElementsByClassName('startButton')[0].removeAttribute('aria-disabled');
+
     var previouslySelected = document.getElementsByClassName('selected');
     for (var i = 0; i < previouslySelected.length; i++) {
       previouslySelected[i].classList.remove('selected');
+      previouslySelected[i].setAttribute('aria-selected','false');
     }
     this.classList.add('selected');
+    this.setAttribute('aria-selected','true');
 
     window.selectedCategory = this.attributes.name.value;
     window.problemsForSelectedCategory = JSON.parse(localStorage.getItem(window.selectedCategory));

@@ -1,4 +1,4 @@
-<html>
+<html lang="en">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
@@ -7,11 +7,12 @@
 		<link href="addEdit.css" rel="stylesheet" />
 	</head>
 	<body>
-		<div class="warnings"></div>
+		<div class="warnings" role="status" aria-live="polite"></div>
 		<div class="content">
 			<span class="navigation">
-				<div class="component">
-					<ul class="categoryList">
+				<div class="component" aria-labelledby="manageCategoriesHeading">
+					<h2 id="manageCategoriesHeading" class="visually-hidden">Manage Categories</h2>
+					<ul class="categoryList" role="listbox" aria-label="Existing categories">
 					</ul>
 
 					<a href="addEditList.html" class="newLink">Add a new category</a>
@@ -21,17 +22,20 @@
 			<span class="categoryDetails">
 				<div class="component">
 					<div class="nameSection">
+						<label for="name" class="visually-hidden">Category name</label>
 						<input class="categoryName" type="text" id="name" placeholder="Type category name here" />
 					</div>
 
-					<div class="questions">
-						<div class="header">
+					<div class="questions" role="group" aria-label="Question and answer pairs">
+						<div class="header" aria-hidden="true">
 							<span class="columnHeading">Question</span>
 							<span class="columnHeading">Answer</span>
 						</div>
 						<div class="question">
-							<input type="text" class="key" placeholder="4+4" />
-							<input type="text" class="value" placeholder="8" />
+							<label class="visually-hidden" for="key-initial">Question</label>
+							<input id="key-initial" type="text" class="key" placeholder="4+4" />
+							<label class="visually-hidden" for="value-initial">Answer</label>
+							<input id="value-initial" type="text" class="value" placeholder="8" />
 						</div>
 					</div>
 

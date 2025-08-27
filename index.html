@@ -1,4 +1,4 @@
-<html>
+<html lang="en">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
@@ -7,21 +7,24 @@
 		<link href="index.css" rel="stylesheet" />
 	</head>
 	<body>
-		<div class="warnings"></div>
+		<div class="warnings" role="status" aria-live="polite"></div>
 		<div class="content">
 			<span class="navigation">
-				<div id="categoryComponent" class="component">
-					<ul class="categoryList">
+				<div id="categoryComponent" class="component" aria-labelledby="categoryListHeading">
+					<h2 id="categoryListHeading" class="visually-hidden">Categories</h2>
+					<ul class="categoryList" role="listbox" aria-label="Flashcard categories">
 					</ul>
 
 					<div class="addMoreSection">
 						<a href="addEditList.html">Add more...</a>
 					</div>
 				</div>
-				<div class="component">
-					<canvas id="cnvTimer" width="150" height="150"></canvas>
-					<div class="timeRemaining">1:00</div>
-					<select class="languageSelector">
+				<div class="component" aria-labelledby="timerHeading">
+					<h2 id="timerHeading" class="visually-hidden">Timer and Controls</h2>
+					<canvas id="cnvTimer" width="150" height="150" role="img" aria-label="Countdown timer"></canvas>
+					<div class="timeRemaining" aria-live="polite">1:00</div>
+					<label for="languageSelector" class="visually-hidden">Recognition language</label>
+					<select id="languageSelector" class="languageSelector" aria-label="Recognition language">
 						<option value="af-ZA">Afrikaans</option>
 						<option value="id-ID">Bahasa Indonesia</option>
 						<option value="ms-MY">Bahasa Melayu</option>
@@ -81,8 +84,8 @@
 						<option value="ja-JP">日本語</option>
 						<option value="la">Lingua latīna</option>
 					</select>
-					<div class="controls">
-						<button title="Please select a category" class="startButton disabled">Start</button>
+					<div class="controls" role="group" aria-label="Game controls">
+						<button title="Please select a category" class="startButton disabled" aria-disabled="true">Start</button>
 					</div>
 
 				</div>
@@ -90,14 +93,14 @@
 			<span class="problemArea">
 				<div class="component instructions" id="firstInstructions">
 					Which category would like to see problems for?
-					<img src="arrow.png" class="leftArrow" />
+					<img src="arrow.png" class="leftArrow" alt="" />
 				</div>
 
 				<div class="component instructions hidden" id="secondInstructions">
 					You will have 60 seconds to get as many correct as you can.  When you click "Start" the browser will ask you for permission to use the microphone.  Once cards start appearing, say the answers out loud.  A new problem won't given until either you say "skip" or get the problem right.
 				</div>
 
-				<div class="component scores hidden">
+				<div class="component scores hidden" role="status" aria-live="polite">
 					<span class="currentScore">
 						Score: <span id="currentScoreValue"></span>
 					</span>
@@ -106,11 +109,11 @@
 					</span>
 				</div>
 
-				<div class="card component hidden">
-					<div class="problem"></div>
+				<div class="card component hidden" role="region" aria-label="Current problem card">
+					<div class="problem" aria-live="polite"></div>
 				</div>
-				<div class="iHeard component hidden">
-					<span class="iHeardLabel">I think I heard you say:</span> <span id="iHeardText"></span>
+				<div class="iHeard component hidden" role="region" aria-labelledby="iHeardLabel">
+					<span class="iHeardLabel" id="iHeardLabel">I think I heard you say:</span> <span id="iHeardText" aria-live="polite"></span>
 					<div class="skipHint">
 						If you get stuck, say "skip"...
 					</div>

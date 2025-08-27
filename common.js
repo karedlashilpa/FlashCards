@@ -1,4 +1,4 @@
-/*global Handlebars */
+ /*global Handlebars */
 
 var common = {
 	getHighScoreFor: function(category) {
@@ -64,16 +64,33 @@ var common = {
 			categories: categories
 		});
 
-		document.getElementsByClassName('categoryList')[0].innerHTML = categoriesHtml;
+		var listEl = document.getElementsByClassName('categoryList')[0];
+		listEl.setAttribute('role', 'listbox');
+		listEl.setAttribute('aria-label', listEl.getAttribute('aria-label') || 'Flashcard categories');
+		listEl.innerHTML = categoriesHtml;
 
 		var categoryElements = document.getElementsByClassName('category');
 		for (var i = 0; i < categoryElements.length; i++) {
+			// add ARIA roles and keyboard accessibility
+			categoryElements[i].setAttribute('role', 'option');
+			categoryElements[i].setAttribute('tabindex', '0');
+			if (!categoryElements[i].hasAttribute('aria-selected')) {
+				categoryElements[i].setAttribute('aria-selected', 'false');
+			}
+
 			if (clickCallback) {
 				categoryElements[i].addEventListener('click', clickCallback);
 			}
 			else {
 				categoryElements[i].addEventListener('click', common.categoryChanged);
 			}
+
+			categoryElements[i].addEventListener('keydown', function(e){
+				if (e.key === 'Enter' || e.key === ' ') {
+					e.preventDefault();
+					this.click();
+				}
+			});
 		}
 	},
 
@@ -96,11 +113,15 @@ var common = {
 		}
 
 		document.getElementsByClassName('startButton')[0].classList.remove('disabled');
+
+		// update visual and ARIA selected states
 		var previouslySelected = document.getElementsByClassName('selected');
 		for (var i = 0; i < previouslySelected.length; i++) {
 			previouslySelected[i].classList.remove('selected');
+			previouslySelected[i].setAttribute('aria-selected', 'false');
 		}
 		this.classList.add('selected');
+		this.setAttribute('aria-selected', 'true');
 
 		window.selectedCategory = this.attributes.name.value;
 		window.problemsForSelectedCategory = JSON.parse(localStorage.getItem(window.selectedCategory));

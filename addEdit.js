@@ -101,11 +101,33 @@ function getListNameFromQueryString() {
 }
 
 function categoryClickedCallback() {
-	document.location = 'addEditList.html?category=' + this.innerHTML;
+\tvar prev = document.querySelectorAll('.category[aria-selected="true"]');
+\tfor (var i=0;i<prev.length;i++){ prev[i].setAttribute('aria-selected','false'); prev[i].classList.remove('selected'); }
+\tthis.setAttribute('aria-selected','true');
+\tthis.classList.add('selected');
+\tdocument.location = 'addEditList.html?category=' + this.innerHTML;
 }
 
 var excludeBuiltinCategories = true;
 common.renderCategories(excludeBuiltinCategories, categoryClickedCallback);
+
+// Accessibility: keyboard support for categories on this page
+(function enhanceCategoryList() {
+\tfunction onKeydown(e){ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.click(); } }
+\tvar list = document.getElementsByClassName('categoryList')[0];
+\tif (!list) return;
+\tvar apply = function(){
+\t\tvar items = document.getElementsByClassName('category');
+\t\tfor (var i = 0; i < items.length; i++) {
+\t\t\titems[i].setAttribute('tabindex','0');
+\t\t\titems[i].setAttribute('role','option');
+\t\t\titems[i].addEventListener('keydown', onKeydown);
+\t\t}
+\t};
+\tapply();
+\tvar obs = new MutationObserver(apply);
+\tobs.observe(list, {childList:true});
+})();
 
 var listToEdit = getListNameFromQueryString();
 if (listToEdit.length > 0) {
