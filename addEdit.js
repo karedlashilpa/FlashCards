@@ -9,6 +9,34 @@ function getNumQuestions() {
 	return count;
 }
 
+// Safe storage helpers to avoid crashes if storage is disabled or blocked
+function safeGetItem(key) {
+	try {
+		if (typeof window !== 'undefined' && window.localStorage) {
+			return window.localStorage.getItem(key);
+		}
+	} catch (e) {}
+	return null;
+}
+function safeSetItem(key, value) {
+	try {
+		if (typeof window !== 'undefined' && window.localStorage) {
+			window.localStorage.setItem(key, value);
+			return true;
+		}
+	} catch (e) {}
+	return false;
+}
+function safeRemoveItem(key) {
+	try {
+		if (typeof window !== 'undefined' && window.localStorage) {
+			window.localStorage.removeItem(key);
+			return true;
+		}
+	} catch (e) {}
+	return false;
+}
+
 $('.saveButton').click(function() {
 	if (getNumQuestions() < 2) {
 		alert('You must provide at least two questions.');
@@ -22,14 +50,18 @@ $('.saveButton').click(function() {
 		return;
 	}
 
-	localStorage.setItem(categoryName, serializeQuestions());
+	// Save the questions for the category safely
+	safeSetItem(categoryName, serializeQuestions());
 
-	var categoryList = localStorage.getItem('categories');
-	if (categoryList) {
-		categoryList = JSON.parse(categoryList);
-	}
-	else {
-		categoryList = [];
+	// Load existing category list safely
+	var categoryListRaw = safeGetItem('categories');
+	var categoryList = [];
+	if (categoryListRaw) {
+		try {
+			categoryList = JSON.parse(categoryListRaw) || [];
+		} catch (e) {
+			categoryList = [];
+		}
 	}
 
 	// See if this list already existed
@@ -40,7 +72,7 @@ $('.saveButton').click(function() {
 	// Only add it if it didn't exist
 	if (!alreadyExists) {
 		categoryList.push(categoryName);
-		localStorage.setItem('categories', JSON.stringify(categoryList));
+		safeSetItem('categories', JSON.stringify(categoryList));
 	}
 
 	document.location = 'index.html';
@@ -48,17 +80,22 @@ $('.saveButton').click(function() {
 
 $('.deleteButton').click(function() {
 	var categoryName = $('.categoryName').val();
-	localStorage.removeItem(categoryName);
+	safeRemoveItem(categoryName);
 
-	var categoryList = localStorage.getItem('categories');
-	if (categoryList) {
-		categoryList = JSON.parse(categoryList);
+	var categoryListRaw = safeGetItem('categories');
+	if (categoryListRaw) {
+		var categoryList = [];
+		try {
+			categoryList = JSON.parse(categoryListRaw) || [];
+		} catch (e) {
+			categoryList = [];
+		}
 
 		categoryList = categoryList.filter(function(theName) {
 			return theName !== categoryName;
 		});
 
-		localStorage.setItem('categories', JSON.stringify(categoryList));
+		safeSetItem('categories', JSON.stringify(categoryList));
 	}
 
 	document.location = 'addEditList.html';
@@ -101,11 +138,11 @@ function getListNameFromQueryString() {
 }
 
 function categoryClickedCallback() {
-\tvar prev = document.querySelectorAll('.category[aria-selected="true"]');
-\tfor (var i=0;i<prev.length;i++){ prev[i].setAttribute('aria-selected','false'); prev[i].classList.remove('selected'); }
-\tthis.setAttribute('aria-selected','true');
-\tthis.classList.add('selected');
-\tdocument.location = 'addEditList.html?category=' + this.innerHTML;
+	var prev = document.querySelectorAll('.category[aria-selected="true"]');
+	for (var i=0;i<prev.length;i++){ prev[i].setAttribute('aria-selected','false'); prev[i].classList.remove('selected'); }
+	this.setAttribute('aria-selected','true');
+	this.classList.add('selected');
+	document.location = 'addEditList.html?category=' + this.innerHTML;
 }
 
 var excludeBuiltinCategories = true;
@@ -113,29 +150,34 @@ common.renderCategories(excludeBuiltinCategories, categoryClickedCallback);
 
 // Accessibility: keyboard support for categories on this page
 (function enhanceCategoryList() {
-\tfunction onKeydown(e){ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.click(); } }
-\tvar list = document.getElementsByClassName('categoryList')[0];
-\tif (!list) return;
-\tvar apply = function(){
-\t\tvar items = document.getElementsByClassName('category');
-\t\tfor (var i = 0; i < items.length; i++) {
-\t\t\titems[i].setAttribute('tabindex','0');
-\t\t\titems[i].setAttribute('role','option');
-\t\t\titems[i].addEventListener('keydown', onKeydown);
-\t\t}
-\t};
-\tapply();
-\tvar obs = new MutationObserver(apply);
-\tobs.observe(list, {childList:true});
+	function onKeydown(e){ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.click(); } }
+	var list = document.getElementsByClassName('categoryList')[0];
+	if (!list) return;
+	var apply = function(){
+		var items = document.getElementsByClassName('category');
+		for (var i = 0; i < items.length; i++) {
+			items[i].setAttribute('tabindex','0');
+			items[i].setAttribute('role','option');
+			items[i].addEventListener('keydown', onKeydown);
+		}
+	};
+	apply();
+	var obs = new MutationObserver(apply);
+	obs.observe(list, {childList:true});
 })();
 
 var listToEdit = getListNameFromQueryString();
 if (listToEdit.length > 0) {
 	$('.deleteButton').show();
 	$('.categoryName').val(listToEdit);
-	var loadedList = localStorage.getItem(listToEdit);
+	var loadedList = safeGetItem(listToEdit);
 	if (loadedList) {
-		var loadedListAsObject = JSON.parse(loadedList);
+		var loadedListAsObject = [];
+		try {
+			loadedListAsObject = JSON.parse(loadedList) || [];
+		} catch (e) {
+			loadedListAsObject = [];
+		}
 		var nodesToAdd = Handlebars.templates['question.html'](loadedListAsObject);
 		$('.header').after(nodesToAdd);
 	}

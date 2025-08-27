@@ -1,24 +1,43 @@
  /*global Handlebars */
 
+// Wrap storage access in safe helpers to handle browsers with disabled storage or quota errors.
+function safeGetItem(key) {
+	try {
+		if (typeof window !== 'undefined' && window.localStorage) {
+			return window.localStorage.getItem(key);
+		}
+	} catch (e) {
+		// ignore and fall through
+	}
+	return null;
+}
+
+function safeSetItem(key, value) {
+	try {
+		if (typeof window !== 'undefined' && window.localStorage) {
+			window.localStorage.setItem(key, value);
+			return true;
+		}
+	} catch (e) {
+		// ignore write failures
+	}
+	return false;
+}
+
 var common = {
 	getHighScoreFor: function(category) {
-		if (localStorage) {
-			var score = localStorage.getItem(category + 'HighScore');
-			if (score > 0) {
-				return score;
-			}
-			else {
-				return 0;
-			}
+		// Return numeric high score; fallback to 0 if storage unavailable or invalid.
+		var scoreStr = safeGetItem(category + 'HighScore');
+		if (scoreStr == null) {
+			return 0;
 		}
-
-		return 0;
+		var scoreNum = parseInt(scoreStr, 10);
+		return isNaN(scoreNum) ? 0 : scoreNum;
 	},
 
 	setHighScoreFor: function(category, score) {
-		if (localStorage) {
-			localStorage.setItem(category + 'HighScore', score);
-		}
+		// Ignore failures silently—game should continue without persistence.
+		safeSetItem(category + 'HighScore', String(score));
 	},
 
 	renderCategories: function(excludeBuiltin, clickCallback) {
@@ -95,16 +114,23 @@ var common = {
 	},
 
 	addCustomCategories: function(arrayToAddTo) {
-		var problemsAsString = localStorage.getItem('categories');
-		if (problemsAsString) {
-			var categoryArray = JSON.parse(problemsAsString);
-			categoryArray.forEach(function(categoryName) {
-				arrayToAddTo.push({
-					name: categoryName,
-					displayName: categoryName
-				});
-			});
+		// Safely read categories list and parse JSON
+		var problemsAsString = safeGetItem('categories');
+		if (!problemsAsString) {
+			return;
 		}
+		var categoryArray = [];
+		try {
+			categoryArray = JSON.parse(problemsAsString) || [];
+		} catch (e) {
+			categoryArray = [];
+		}
+		categoryArray.forEach(function(categoryName) {
+			arrayToAddTo.push({
+				name: categoryName,
+				displayName: categoryName
+			});
+		});
 	},
 
 	categoryChanged: function() {
@@ -124,7 +150,17 @@ var common = {
 		this.setAttribute('aria-selected', 'true');
 
 		window.selectedCategory = this.attributes.name.value;
-		window.problemsForSelectedCategory = JSON.parse(localStorage.getItem(window.selectedCategory));
+		// Safely get problems for selected category and parse JSON
+		var raw = safeGetItem(window.selectedCategory);
+		var parsed = [];
+		if (raw) {
+			try {
+				parsed = JSON.parse(raw) || [];
+			} catch (e) {
+				parsed = [];
+			}
+		}
+		window.problemsForSelectedCategory = parsed;
 
 		window.highScore = common.getHighScoreFor(window.selectedCategory);
 		document.getElementById('highScoreValue').innerHTML = window.highScore;
