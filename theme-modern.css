@@ -272,6 +272,49 @@ a:hover { color: var(--primary-700); }
   color: var(--text);
 }
 
+/* New: Answer options below the problem */
+.answerOptions {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  justify-items: center;
+}
+.answerOptionBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, #ffffff, #f8fbff);
+  color: var(--text);
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform .05s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+  box-shadow: 0 4px 10px rgba(10, 40, 80, 0.06);
+}
+.answerOptionBtn:hover {
+  background: var(--surface-alt);
+  border-color: #c6dcfb;
+  transform: translateY(-1px);
+}
+.answerOptionBtn:active {
+  transform: translateY(1px);
+}
+.answerOptionBtn.correct {
+  background: linear-gradient(135deg, var(--success), #2ad38a);
+  color: #fff;
+  border-color: transparent;
+}
+.answerOptionBtn.incorrect {
+  background: linear-gradient(135deg, var(--danger), #ff8e92);
+  color: #fff;
+  border-color: transparent;
+}
+
 /* I heard */
 .iHeard {
   background: var(--surface);

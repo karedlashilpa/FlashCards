@@ -6,6 +6,11 @@ var SpeechRecognition = window.mozSpeechRecognition ||
 	window.SpeechRecognition;
 
 var currentProblem;
+/**
+ * Stores the last rendered answer options for the current card.
+ * For math cards: array of numbers as strings. For vocab cards: array of strings.
+ */
+var currentOptions = [];
 var currentScore = 0;
 var highScore = 0;
 var timerCtx = document.getElementById('cnvTimer').getContext('2d');
@@ -90,6 +95,157 @@ function getRandomInteger(ceiling) {
 	return Math.floor(Math.random() * ceiling + 1);
 }
 
+function randInt(min, max) {
+	return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+/**
+ * Builds a set of answer options for the current problem.
+ * - For math: returns numeric strings including the right answer and plausible distractors.
+ * - For vocab/list-based: returns strings with the correct value and sampled distractors.
+ */
+function buildAnswerOptions(category, problem, desiredCount) {
+	var options = [];
+	var correct = problem.value;
+	var count = desiredCount || 4;
+
+	function shuffle(arr) {
+		for (var i = arr.length - 1; i > 0; i--) {
+			var j = Math.floor(Math.random() * (i + 1));
+			var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+		}
+		return arr;
+	}
+
+	// Normalize correct value to string for comparisons
+	var correctStr = (typeof correct === 'number') ? ('' + correct) : ('' + correct);
+
+	if (category.indexOf('builtin-') === 0) {
+		// Math categories: fabricate nearby numeric distractors
+		if (category === 'builtin-addition' || category === 'builtin-subtraction' || category === 'builtin-multiplication' || category === 'builtin-division') {
+			var base = (typeof correct === 'number') ? correct : parseFloat(correct);
+			var pool = new Set();
+			pool.add('' + base);
+			// Create up to 8 candidates around base
+			for (var d = -6; d <= 6; d++) {
+				if (d === 0) continue;
+				pool.add('' + (base + d));
+			}
+			// Some random alternatives
+			for (var k = 0; k < 6; k++) {
+				pool.add('' + (base + randInt(-12, 12)));
+			}
+			options = Array.from(pool);
+			options = shuffle(options).slice(0, Math.max(count - 1, 1)); // take some distractors first
+			// Ensure we include correct answer
+			if (options.indexOf('' + base) === -1) {
+				options[options.length - 1] = '' + base;
+			}
+			options.push('' + base);
+			options = shuffle(options).slice(0, count);
+			return options;
+		}
+
+		// Built-in non-math: pick from corresponding sample set values
+		var poolList = null;
+		if (category === 'builtin-capitals') poolList = samples.capitals;
+		else if (category === 'builtin-chemSymbols') poolList = samples.chemSymbols;
+		else if (category === 'builtin-spanish') poolList = samples.spanishWords;
+
+		if (poolList && poolList.length) {
+			var values = poolList.map(function (p) { return '' + p.value; });
+			var unique = Array.from(new Set(values));
+			unique = unique.filter(function (v) { return v.toLowerCase() !== ('' + correct).toLowerCase(); });
+			unique = shuffle(unique).slice(0, Math.max(count - 1, 1));
+			unique.push(correctStr);
+			return shuffle(unique);
+		}
+	}
+
+	// Custom categories: sample values from the category list
+	var customList = window.problemsForSelectedCategory || [];
+	if (Array.isArray(customList) && customList.length > 0) {
+		var vals = customList.map(function (p) { return '' + p.value; });
+		var uniqVals = Array.from(new Set(vals)).filter(function (v) {
+			return v.toLowerCase() !== ('' + correct).toLowerCase();
+		});
+		var take = shuffle(uniqVals).slice(0, Math.max(count - 1, 1));
+		take.push(correctStr);
+		return shuffle(take);
+	}
+
+	// Fallback: only correct
+	return [correctStr];
+}
+
+/**
+ * Renders clickable answer option buttons and wires click handlers.
+ */
+function renderAnswerOptions(options, correctValue) {
+	currentOptions = options.slice();
+	var container = document.getElementById('answerOptions');
+	if (!container) return;
+
+	// Clear previous
+	container.innerHTML = '';
+
+	// Render "open-ended" entry for custom text (optional UX)
+	// Keep simple: rely on provided options; we can add open-ended later if needed.
+
+	options.forEach(function (opt) {
+		var btn = document.createElement('button');
+		btn.className = 'answerOptionBtn';
+		btn.type = 'button';
+		btn.setAttribute('aria-label', 'Answer option: ' + opt);
+		btn.textContent = opt;
+		btn.addEventListener('click', function () {
+			processClickedAnswer(opt, correctValue);
+		});
+		container.appendChild(btn);
+	});
+}
+
+/**
+ * Handles a clicked answer: marks correctness, updates score, and advances problem if correct.
+ */
+function processClickedAnswer(selected, correctValue) {
+	var correctStr = ('' + (typeof correctValue === 'number' ? correctValue : correctValue)).toLowerCase();
+	var chosenStr = ('' + selected).toLowerCase();
+
+	var container = document.getElementById('answerOptions');
+	if (!container) return;
+
+	// Mark buttons
+	var buttons = container.getElementsByClassName('answerOptionBtn');
+	for (var i = 0; i < buttons.length; i++) {
+		var btn = buttons[i];
+		var val = ('' + btn.textContent).toLowerCase();
+		// Indicate correct one
+		if (val === correctStr) {
+			btn.classList.add('correct');
+		}
+		// Indicate chosen wrong
+		if (val === chosenStr && val !== correctStr) {
+			btn.classList.add('incorrect');
+		}
+		// Disable further clicks
+		btn.disabled = true;
+	}
+
+	// If correct, increment score and move to next problem after brief delay
+	if (chosenStr === correctStr) {
+		currentScore++;
+		var scoreElement = document.getElementById('currentScoreValue');
+		scoreElement.textContent = currentScore;
+		if (currentScore > highScore) {
+			scoreElement.classList.add('highlight');
+		}
+		setTimeout(function () {
+			showNextProblem();
+		}, 350);
+	}
+}
+
 function showNextProblem() {
 	var problemText;
 	var previousProblem = currentProblem;
@@ -130,6 +286,10 @@ function showNextProblem() {
 		}
 	}
 	document.getElementsByClassName('problem')[0].textContent = problemText;
+
+	// Build and render options for this problem
+	var opts = buildAnswerOptions(selectedCategory, currentProblem, 4);
+	renderAnswerOptions(opts, currentProblem.value);
 }
 
 function startSpeechRecognition() {
@@ -223,18 +383,18 @@ function startSpeechRecognition() {
 }
 
 function checkAnswer(guess) {
-	var trimmedGuess = guess.trim().toLowerCase();
-	var answer = currentProblem.value;
-	if (typeof answer === 'string') {
-		answer = answer.toLowerCase();
-	}
+	var trimmedGuess = (guess || '').trim().toLowerCase();
+	var answer = currentProblem && currentProblem.value;
+	var answerLower = ('' + (typeof answer === 'string' ? answer : '' + answer)).toLowerCase();
 
-
-	if (/skip|next question/gi.test(guess) || trimmedGuess.indexOf(answer) >= 0) {
+	// Allow "skip" or "next question" to advance without scoring
+	if (/skip|next question/gi.test(guess)) {
 		showNextProblem();
+		return;
 	}
 
-	if (trimmedGuess.indexOf(answer) >= 0) {
+	// If user's spoken text contains the answer, count as correct and advance
+	if (trimmedGuess.indexOf(answerLower) >= 0 && answerLower.length > 0) {
 		currentScore++;
 		var scoreElement = document.getElementById('currentScoreValue');
 		scoreElement.textContent = currentScore;
@@ -242,6 +402,7 @@ function checkAnswer(guess) {
 		if (currentScore > highScore) {
 			scoreElement.classList.add('highlight');
 		}
+		showNextProblem();
 	}
 }
 

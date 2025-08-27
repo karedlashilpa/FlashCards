@@ -75,6 +75,31 @@
 	border: 1px solid rgb(53, 95, 109);
 }
 
+/* Basic fallback styling for answer options */
+.answerOptions {
+  margin-top: 10px;
+}
+.answerOptionBtn {
+  display: inline-block;
+  margin: 6px;
+  padding: 8px 12px;
+  border: 1px solid #cfd8e3;
+  border-radius: 8px;
+  background: #f7fbff;
+  cursor: pointer;
+  font-size: 16px;
+}
+.answerOptionBtn.correct {
+  background: #1fbf75;
+  color: #fff;
+  border-color: #1fbf75;
+}
+.answerOptionBtn.incorrect {
+  background: #ff5a5f;
+  color: #fff;
+  border-color: #ff5a5f;
+}
+
 .controls {
 	text-align: center;
 	margin-top: 30px;
