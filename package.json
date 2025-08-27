@@ -1,0 +1,18 @@
+{
+  "name": "flashcards-angularjs",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A browser-based educational flashcard game using speech recognition (static AngularJS app).",
+  "license": "MIT",
+  "scripts": {
+    "start": "http-server -p ${PORT:-3000} -c-1 -a 0.0.0.0",
+    "build": "echo 'No build step needed for static app'",
+    "postinstall": "echo 'No dependencies to build'"
+  },
+  "dependencies": {
+    "http-server": "^14.1.1"
+  },
+  "engines": {
+    "node": ">=16"
+  }
+}

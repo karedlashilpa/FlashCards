@@ -6,6 +6,7 @@
     <title>Flash Cards</title>
     <link href="common.css" rel="stylesheet" />
     <link href="index.css" rel="stylesheet" />
+    <link href="theme-modern.css" rel="stylesheet" />
 
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.6/angular.min.js"></script>
   </head>
@@ -25,9 +26,9 @@
           </div>
         </div>
         <div class="component">
-          <canvas id="cnvTimer" width="150" height="150"></canvas>
-          <div class="timeRemaining">1:00</div>
-          <select class="languageSelector">
+          <canvas id="cnvTimer" width="150" height="150" role="img" aria-label="Countdown timer"></canvas>
+          <div class="timeRemaining" aria-live="polite">1:00</div>
+          <select class="languageSelector" aria-label="Recognition language selector" title="Recognition language">
             <option value="af-ZA">Afrikaans</option>
             <option value="id-ID">Bahasa Indonesia</option>
             <option value="ms-MY">Bahasa Melayu</option>
@@ -88,7 +89,7 @@
             <option value="la">Lingua latīna</option>
           </select>
           <div class="controls">
-            <button title="Please select a category" ng-class="startButtonClasses" ng-click="startClicked()">Start</button>
+            <button title="Start the 60-second challenge" aria-live="polite" aria-label="Start challenge" ng-class="startButtonClasses" ng-click="startClicked()">Start</button>
           </div>
 
         </div>
@@ -100,7 +101,26 @@
         </div>
 
         <div class="component instructions hidden" id="secondInstructions">
-          You will have 60 seconds to get as many correct as you can.  When you click "Start" the browser will ask you for permission to use the microphone.  Once cards start appearing, say the answers out loud.  A new problem won't given until either you say "skip" or get the problem right.
+          You have 60 seconds to score as many points as you can. When you click “Start,” your browser will ask for microphone access. Once cards appear, say the answers out loud. A new problem appears when you say “skip” or get it right.
+        </div>
+
+        <!-- New: PDF Upload to autogenerate flashcards (Angular view) -->
+        <div class="component" id="pdfUploadComponent" aria-label="Upload interview questions PDF">
+          <h3 style="margin:0 0 8px 0;">Upload interview questions PDF</h3>
+          <p style="margin:0 0 10px 0; color:#5b6b7a;">We will extract Q&A pairs and create a new category for you automatically.</p>
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <input type="file" id="pdfInput" accept="application/pdf" aria-label="Choose PDF file" />
+            <input type="text" id="pdfCategoryName" placeholder="Category name (e.g., Interview: JS)" aria-label="New category name" style="padding:8px; border:1px solid #d8e6f7; border-radius:10px;" />
+            <button id="processPdfBtn" class="startButton" style="background:linear-gradient(135deg,#2a8cff,#58a9ff);">Generate Flashcards</button>
+          </div>
+          <div id="pdfHelp" style="margin-top:8px; font-size:14px; color:#5b6b7a;">
+            Expected formats:
+            <ul style="margin:6px 0 0 18px;">
+              <li>Q: What is closure? A: A function with preserved lexical scope.</li>
+              <li>Question - Answer pairs on separate lines using colon (:), dash (-), or question mark (?)</li>
+            </ul>
+          </div>
+          <div id="pdfStatus" role="status" aria-live="polite" style="margin-top:8px; font-size:14px;"></div>
         </div>
 
         <div class="component scores hidden">
@@ -112,13 +132,14 @@
           </span>
         </div>
 
-        <div class="card component hidden">
-          <div class="problem"></div>
+        <div class="card component hidden" role="group" aria-label="Flashcard">
+          <div class="problem" role="heading" aria-level="2" aria-live="polite"></div>
+          <div id="answerOptions" class="answerOptions" role="listbox" aria-label="Answer options"></div>
         </div>
         <div class="iHeard component hidden">
           <span class="iHeardLabel">I think I heard you say:</span> <span id="iHeardText"></span>
           <div class="skipHint">
-            If you get stuck, say "skip"...
+            Stuck? Say “skip” to move on.
           </div>
         </div>
       </span>
@@ -137,6 +158,9 @@
     <script src="common.js"></script>
     <script src="sampleProblems.js"></script>
     <script src="main.js"></script-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="pdf-import.js"></script>
 
     <script type="text/javascript">
       var _gaq = _gaq || [];
