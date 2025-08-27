@@ -10,7 +10,7 @@
 
 .problem {
 	white-space: normal;
-	min-height: 154;
+	min-height: 154px; /* add missing unit */
 }
 
 .timeRemaining {
