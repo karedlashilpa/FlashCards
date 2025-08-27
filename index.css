@@ -7,6 +7,10 @@
 	text-align: center;
 	margin: 10px 10px;
 }
+/* modern theme adjustments */
+.problemArea .component {
+  background: #ffffff;
+}
 
 .problem {
 	white-space: normal;
@@ -33,9 +37,10 @@
 	font-weight: normal;
 	white-space: normal;
 	text-align: left;
-	padding: 50px;
+	padding: 32px;
 	margin-left: 0;
 	max-width: 834px;
+	row-gap: 12px;
 }
 
 .iHeard {

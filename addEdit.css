@@ -38,13 +38,12 @@
 }
 
 .deleteButton {
-	border: 2px solid #290000;
-	border-radius: 6px;
-	font-size: 20px;
-	padding: 4px;
+	border: 0;
+	border-radius: 10px;
+	font-size: 16px;
+	padding: 10px 14px;
 	cursor: pointer;
-	color: white;
-	text-shadow: 1px 2px 1px #460000;
+	color: #fff;
 	background: #EB0000;
 	margin-left: 30px;
 	display: none;

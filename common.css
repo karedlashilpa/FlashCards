@@ -4,6 +4,13 @@ body {
 	font-family: Arial, Arial, Helvetica, sans-serif;
 	background-color: rgb(227, 235, 238);
 }
+/* modern theme complements */
+.component {
+  border-radius: 12px;
+}
+.category {
+  border-radius: 10px;
+}
 
 div, span {
 	box-sizing: border-box;

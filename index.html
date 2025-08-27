@@ -5,6 +5,7 @@
 		<title>Flash Cards</title>
 		<link href="common.css" rel="stylesheet" />
 		<link href="index.css" rel="stylesheet" />
+		<link href="theme-modern.css" rel="stylesheet" />
 	</head>
 	<body>
 		<div class="warnings"></div>
@@ -19,9 +20,9 @@
 					</div>
 				</div>
 				<div class="component">
-					<canvas id="cnvTimer" width="150" height="150"></canvas>
-					<div class="timeRemaining">1:00</div>
-					<select class="languageSelector">
+					<canvas id="cnvTimer" width="150" height="150" role="img" aria-label="Countdown timer"></canvas>
+					<div class="timeRemaining" aria-live="polite">1:00</div>
+					<select class="languageSelector" aria-label="Recognition language selector" title="Recognition language">
 						<option value="af-ZA">Afrikaans</option>
 						<option value="id-ID">Bahasa Indonesia</option>
 						<option value="ms-MY">Bahasa Melayu</option>
@@ -82,7 +83,7 @@
 						<option value="la">Lingua latīna</option>
 					</select>
 					<div class="controls">
-						<button title="Please select a category" class="startButton disabled">Start</button>
+						<button title="Start the 60-second challenge" aria-live="polite" aria-label="Start challenge" class="startButton disabled">Start</button>
 					</div>
 
 				</div>
@@ -94,7 +95,7 @@
 				</div>
 
 				<div class="component instructions hidden" id="secondInstructions">
-					You will have 60 seconds to get as many correct as you can.  When you click "Start" the browser will ask you for permission to use the microphone.  Once cards start appearing, say the answers out loud.  A new problem won't given until either you say "skip" or get the problem right.
+					You have 60 seconds to score as many points as you can. When you click “Start,” your browser will ask for microphone access. Once cards appear, say the answers out loud. A new problem appears when you say “skip” or get it right.
 				</div>
 
 				<div class="component scores hidden">
@@ -112,7 +113,7 @@
 				<div class="iHeard component hidden">
 					<span class="iHeardLabel">I think I heard you say:</span> <span id="iHeardText"></span>
 					<div class="skipHint">
-						If you get stuck, say "skip"...
+						Stuck? Say “skip” to move on.
 					</div>
 				</div>
 			</span>
