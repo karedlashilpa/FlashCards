@@ -80,6 +80,14 @@ $('.saveButton').click(function() {
 
 $('.deleteButton').click(function() {
 	var categoryName = $('.categoryName').val();
+
+	// Confirm with the user before deleting the category and its questions
+	var confirmed = window.confirm('Delete the category "' + categoryName + '" and all its questions? This cannot be undone.');
+	if (!confirmed) {
+		return; // Abort deletion if user cancels
+	}
+
+	// Proceed with deletion
 	safeRemoveItem(categoryName);
 
 	var categoryListRaw = safeGetItem('categories');
